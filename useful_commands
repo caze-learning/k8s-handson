@@ -25,6 +25,11 @@ docker images
 # Test docker installation
 docker run hello-world
 
+#Install kubectl to access cluster
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+chmod +x kubectl
+sudo mv kubectl /usr/local/bin
+
 #Install kind cluster
 [ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
 chmod +x ./kind
@@ -44,11 +49,17 @@ nodes:
 
 kind create cluster --config cluster-config.yaml
 
-#Install kubectl to access cluster
-curl -LO https://dl.k8s.io/release/v1.29.1/bin/linux/amd64/kubectl
-sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-chmod +x kubectl
-mkdir -p ~/.local/bin
-mv ./kubectl ~/.local/bin/kubectl
-# Verify the installation
-kubectl version --client
+#kind ingress
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+
+# helm installation:
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+chmod +x get_helm.sh
+./get_helm.sh
+helm version
+
+#Check kubernetes cluster status. Should be able to see different pods
+kubectl get pods -A
+
+
+
